@@ -342,6 +342,17 @@ contract ApparelMarketplace is IERC721Receiver{
         uint256 updateTime;
         bool isForSale;
         bool isAlreadyListed;
+        mapping(uint256 => Auction) auctionDetail;
+    }
+
+    struct Auction{
+        uint256 tokenId;
+        uint256 startTime;
+        uint256 endTime;
+        uint256 baseAmount;
+        address[] participatedUser;
+        uint256[] bidAmount;
+        bool isOutForAuction;
     }
 
     uint256 public platformFee = 200;
@@ -354,12 +365,17 @@ contract ApparelMarketplace is IERC721Receiver{
     IERC20 peak;
 
     modifier notListed(address nftAddress, uint256 tokenId){
-        require(nftDetails[nftAddress][tokenId].isAlreadyListed == false);
+        require(nftDetails[nftAddress][tokenId].isAlreadyListed == false, "Already listed");
         _;
     }
 
     modifier isListed(address nftAddress, uint256 tokenId){
-        require(nftDetails[nftAddress][tokenId].isAlreadyListed == true);
+        require(nftDetails[nftAddress][tokenId].isAlreadyListed == true, "Not listed");
+        _;
+    }
+
+    modifier isOutForAuction(address nftAddress, uint256 tokenId){
+        require(nftDetails[nftAddress][tokenId].auctionDetail[tokenId].isOutForAuction == true, "Token is not available for auction");
         _;
     }
 
@@ -407,6 +423,21 @@ contract ApparelMarketplace is IERC721Receiver{
         nftDetails[_nftAddress][_tokenId].pricePeak = 0;
         nftDetails[_nftAddress][_tokenId].updateTime = block.timestamp;
         nftDetails[_nftAddress][_tokenId].isForSale = false;
+    }
+
+    function startAuction(address _nftAddress, uint256 _tokenId, uint256 _startTime, uint256 _endTime, uint256 _baseAmount) public isOutForAuction(_nftAddress, _tokenId){
+        require(_startTime > block.timestamp && _startTime > _endTime, "Invalid time");
+        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].startTime = _startTime;
+        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].endTime = _endTime;
+        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].baseAmount = _baseAmount;
+        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].isOutForAuction = true;
+    }
+
+    function participateInAuction(address _nftAddress, uint256 _tokenId, uint256 _amount) public isOutForAuction(_nftAddress, _tokenId){
+        require(nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].baseAmount <= _amount, "Invalid amount");
+        require(peak.transferFrom(msg.sender, address(this), _amount), "Transfer failed");
+        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].participatedUser.push(msg.sender);
+        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].bidAmount.push(_amount);
     }
 
     function getPeakAddress() public view returns(IERC20){
