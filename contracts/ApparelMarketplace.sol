@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.11;
+pragma solidity ^0.8.11;
+
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 
 /**
  * @title SafeMath
@@ -329,7 +334,16 @@ interface IERC721Receiver {
 }
 
 
-contract ApparelMarketplace is IERC721Receiver{
+contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUpgradeable, OwnableUpgradeable {
+    
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+
+    function initialize(IERC20 _peak) public initializer {
+        peak = _peak;
+        platformFee = 200;
+        __Ownable_init();
+    }
+    
     using SafeMath for uint256;
 
     struct NFTDetails{
@@ -355,7 +369,7 @@ contract ApparelMarketplace is IERC721Receiver{
         bool isOutForAuction;
     }
 
-    uint256 public platformFee = 200;
+    uint256 public platformFee;
 
     mapping(address => mapping(uint256 => NFTDetails)) public nftDetails;
     mapping(address => uint256[]) private tokenList;
@@ -377,10 +391,6 @@ contract ApparelMarketplace is IERC721Receiver{
     modifier isOutForAuction(address nftAddress, uint256 tokenId){
         require(nftDetails[nftAddress][tokenId].auctionDetail[tokenId].isOutForAuction == true, "Token is not available for auction");
         _;
-    }
-
-    constructor(IERC20 _peak) {
-        peak = _peak;
     }
 
     function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
