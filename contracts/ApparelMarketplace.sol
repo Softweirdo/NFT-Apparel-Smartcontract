@@ -337,12 +337,6 @@ interface IERC721Receiver {
 contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUpgradeable, OwnableUpgradeable {
     
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
-
-    function initialize(IERC20 _peak) public initializer {
-        peak = _peak;
-        platformFee = 200;
-        __Ownable_init();
-    }
     
     using SafeMath for uint256;
 
@@ -377,6 +371,13 @@ contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUp
     address[] listedNFTs;
 
     IERC20 peak;
+
+    // required function for implementing proxy
+    function initialize(IERC20 _peak) public initializer {
+        peak = _peak;
+        platformFee = 200;
+        __Ownable_init();
+    }
 
     modifier notListed(address nftAddress, uint256 tokenId){
         require(nftDetails[nftAddress][tokenId].isAlreadyListed == false, "Already listed");
