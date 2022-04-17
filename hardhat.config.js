@@ -24,8 +24,8 @@ module.exports = {
   defaultNetwork: 'rinkeby',
   networks: {
     'rinkeby': {
-      url: 'https://eth-rinkeby.alchemyapi.io/v2/TUS8IAxsvB8JQWiEWO9MaXc7fGJsUjwf',
-      accounts: ['30e05974d10d6b1c6fef67fe7aaf45986963a51ae5c28c231c2fada91de7b3d4']
+      url: '',
+      accounts: ['']
     }
   },
   solidity: {
@@ -40,6 +40,6 @@ module.exports = {
 etherscan: {
   // Your API key for Etherscan
   // Obtain one at https://etherscan.io/
-  apiKey: "XDV82PA6A8GJW9DBFEVIVCC6NGQRCXTQQ5"
+  apiKey: ""
 }
 };
