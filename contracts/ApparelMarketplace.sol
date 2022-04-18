@@ -491,7 +491,7 @@ contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUp
 
     function participateInAuction(address _nftAddress, uint256 _tokenId, uint256 _amount) public payable isOutForAuction(_nftAddress, _tokenId){
         NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
-
+        require(block.timestamp < nftDetail.auctionDetail[_tokenId].endTime, "Invalid time");
         if(nftDetail.auctionDetail[_tokenId].isMetis){
             require(msg.value >= nftDetail.auctionDetail[_tokenId].baseAmount, "Invalid metis amount");
             nftDetail.auctionDetail[_tokenId].bidAmount.push(msg.value);
@@ -502,6 +502,12 @@ contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUp
         }
 
         nftDetail.auctionDetail[_tokenId].participatedUser.push(msg.sender);
+    }
+
+    function cancelAuction(address _nftAddress, uint256 _tokenId) public isOutForAuction(_nftAddress, _tokenId) isTokenOwner(address(_nftAddress), _tokenId){
+        NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
+
+        nftDetail.auctionDetail[_tokenId].isOutForAuction = false;
     }
 
     function endAuction(address _nftAddress, uint256 _tokenId) public isOutForAuction(_nftAddress, _tokenId) isTokenOwner(address(_nftAddress), _tokenId){
