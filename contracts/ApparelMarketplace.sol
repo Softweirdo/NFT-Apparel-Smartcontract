@@ -308,6 +308,8 @@ interface IERC20 {
         address to,
         uint256 amount
     ) external returns (bool);
+
+    function burn(uint256 amount) external;
 }
 
 /**
@@ -363,10 +365,14 @@ contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUp
         address auctionWinner;
         address[] participatedUser;
         uint256[] bidAmount;
+        bool isMetis;
         bool isOutForAuction;
     }
 
     uint256 public platformFee;
+
+    address public NFTA;
+    address public NFTATreasury;
 
     mapping(address => mapping(uint256 => NFTDetails)) public nftDetails;
     mapping(address => uint256[]) private tokenList;
@@ -376,8 +382,10 @@ contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUp
     IERC20 peak;
 
     // required function for implementing proxy
-    function initialize(IERC20 _peak) public initializer {
+    function initialize(IERC20 _peak, address _NFTA, address _NFTATreasury) public initializer {
         peak = _peak;
+        NFTA = _NFTA;
+        NFTATreasury = _NFTATreasury;
         platformFee = 200;
         __Ownable_init();
     }
@@ -411,70 +419,100 @@ contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUp
     }
 
     function listTokenToMarketplace(address _nftAddress, uint256 _tokenId, uint256 _priceMetis, uint256 _pricePeak, uint256 _royaltyFees) public notListed(address(_nftAddress), _tokenId){
-        nftDetails[_nftAddress][_tokenId].tokenOwner = msg.sender;
-        nftDetails[_nftAddress][_tokenId].secondaryOwner = msg.sender;
-        nftDetails[_nftAddress][_tokenId].nftAddress = IERC721(_nftAddress);
-        nftDetails[_nftAddress][_tokenId].tokenId = _tokenId;
-        nftDetails[_nftAddress][_tokenId].priceMetis = _priceMetis;
-        nftDetails[_nftAddress][_tokenId].priceMetis = _pricePeak;
-        nftDetails[_nftAddress][_tokenId].royaltyFee = _royaltyFees;
-        nftDetails[_nftAddress][_tokenId].listedTime = block.timestamp;
-        nftDetails[_nftAddress][_tokenId].updateTime = block.timestamp;
-        nftDetails[_nftAddress][_tokenId].isForSale = true;
-        nftDetails[_nftAddress][_tokenId].isAlreadyListed = true;
+        NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
+
+        nftDetail.tokenOwner = msg.sender;
+        nftDetail.secondaryOwner = msg.sender;
+        nftDetail.nftAddress = IERC721(_nftAddress);
+        nftDetail.tokenId = _tokenId;
+        nftDetail.priceMetis = _priceMetis;
+        nftDetail.priceMetis = _pricePeak;
+        nftDetail.royaltyFee = _royaltyFees;
+        nftDetail.listedTime = block.timestamp;
+        nftDetail.updateTime = block.timestamp;
+        nftDetail.isForSale = true;
+        nftDetail.isAlreadyListed = true;
+
         IERC721(_nftAddress).safeTransferFrom(msg.sender, address(this), _tokenId);
         listedNFTs.push(_nftAddress);
         tokenList[_nftAddress].push(_tokenId);
     }
 
     function updateListedToken(address _nftAddress, uint256 _tokenId, uint256 _priceMetis, uint256 _pricePeak, uint256 _royalty, bool _isForSale) public isListed(address(_nftAddress), _tokenId) isTokenOwner(address(_nftAddress), _tokenId){
-        nftDetails[_nftAddress][_tokenId].priceMetis = _priceMetis;
-        nftDetails[_nftAddress][_tokenId].pricePeak = _pricePeak;
-        nftDetails[_nftAddress][_tokenId].royaltyFee = _royalty;
-        nftDetails[_nftAddress][_tokenId].updateTime = block.timestamp;
-        nftDetails[_nftAddress][_tokenId].isForSale = _isForSale;
+        NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
+
+        nftDetail.priceMetis = _priceMetis;
+        nftDetail.pricePeak = _pricePeak;
+        nftDetail.royaltyFee = _royalty;
+        nftDetail.updateTime = block.timestamp;
+        nftDetail.isForSale = _isForSale;
     }
 
     function buyToken(address _nftAddress, uint256 _tokenId, bool _isMetis) public payable isListed(address(_nftAddress), _tokenId){
+        NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
+
+        require(nftDetail.auctionDetail[_tokenId].isOutForAuction == false, "Token is on auction");
+
         if(_isMetis){
-            uint fee = nftDetails[_nftAddress][_tokenId].priceMetis.mul(platformFee).div(1e4);
-            require(msg.value == nftDetails[_nftAddress][_tokenId].priceMetis, "Incorrenct price");
-            payable(nftDetails[_nftAddress][_tokenId].tokenOwner).transfer(getRoyaltyAmount(_nftAddress, _tokenId));
-            payable(nftDetails[_nftAddress][_tokenId].secondaryOwner).transfer(nftDetails[_nftAddress][_tokenId].priceMetis.sub(fee).sub(getRoyaltyAmount(_nftAddress, _tokenId)));
+            (, uint treasury, uint fee, uint amountTobePaid) = calculateFeesForMetis(nftDetail.priceMetis);
+            require(msg.value == nftDetail.priceMetis, "Incorrenct price");
+            payable(NFTA).transfer(fee);
+            payable(NFTATreasury).transfer(treasury);
+            payable(nftDetail.tokenOwner).transfer(getRoyaltyAmount(_nftAddress, _tokenId));
+            payable(nftDetail.secondaryOwner).transfer(amountTobePaid.sub(getRoyaltyAmount(_nftAddress, _tokenId)));
         }else{
-            uint fee = nftDetails[_nftAddress][_tokenId].pricePeak.mul(platformFee).div(1e4);
-            require(peak.transferFrom(msg.sender, nftDetails[_nftAddress][_tokenId].tokenOwner, getRoyaltyAmount(_nftAddress, _tokenId)), "Transfer failed");
-            require(peak.transferFrom(msg.sender, nftDetails[_nftAddress][_tokenId].secondaryOwner, nftDetails[_nftAddress][_tokenId].pricePeak.sub(fee).sub(getRoyaltyAmount(_nftAddress, _tokenId))), "Transfer failed");
+            (, uint burn, uint fee, uint amountTobePaid) = calculateFeesForPeak(nftDetail.pricePeak);
+            peakTransferFrom(msg.sender, address(this), nftDetail.pricePeak);
+            peakTransfer(nftDetail.tokenOwner, getRoyaltyAmount(_nftAddress, _tokenId));
+            peak.burn(burn);
+            peakTransfer(NFTA, fee);
+            peakTransfer(nftDetail.secondaryOwner, amountTobePaid.sub(getRoyaltyAmount(_nftAddress, _tokenId)));
         }
+
         IERC721(_nftAddress).safeTransferFrom(address(this), msg.sender, _tokenId);
-        nftDetails[_nftAddress][_tokenId].priceMetis = 0;
-        nftDetails[_nftAddress][_tokenId].pricePeak = 0;
-        nftDetails[_nftAddress][_tokenId].secondaryOwner = msg.sender;
-        nftDetails[_nftAddress][_tokenId].updateTime = block.timestamp;
-        nftDetails[_nftAddress][_tokenId].isForSale = false;
+
+        nftDetail.priceMetis = 0;
+        nftDetail.pricePeak = 0;
+        nftDetail.secondaryOwner = msg.sender;
+        nftDetail.updateTime = block.timestamp;
+        nftDetail.isForSale = false;
     }
 
-    function startAuction(address _nftAddress, uint256 _tokenId, uint256 _startTime, uint256 _endTime, uint256 _baseAmount) public isOutForAuction(_nftAddress, _tokenId) isTokenOwner(address(_nftAddress), _tokenId){
+    function startAuction(address _nftAddress, uint256 _tokenId, uint256 _startTime, uint256 _endTime, uint256 _baseAmount, bool _isMetis) public isTokenOwner(address(_nftAddress), _tokenId){
+        NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
+        require(!nftDetail.auctionDetail[_tokenId].isOutForAuction, "Token is on auction");
         require(_startTime > block.timestamp && _startTime > _endTime, "Invalid time");
-        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].startTime = _startTime;
-        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].endTime = _endTime;
-        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].baseAmount = _baseAmount;
-        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].isOutForAuction = true;
+        nftDetail.auctionDetail[_tokenId].startTime = _startTime;
+        nftDetail.auctionDetail[_tokenId].endTime = _endTime;
+        nftDetail.auctionDetail[_tokenId].baseAmount = _baseAmount;
+        nftDetail.auctionDetail[_tokenId].isMetis = _isMetis;
+        nftDetail.auctionDetail[_tokenId].isOutForAuction = true;
     }
 
-    function participateInAuction(address _nftAddress, uint256 _tokenId, uint256 _amount) public isOutForAuction(_nftAddress, _tokenId){
-        require(nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].baseAmount <= _amount, "Invalid amount");
-        require(peak.transferFrom(msg.sender, address(this), _amount), "Transfer failed");
-        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].participatedUser.push(msg.sender);
-        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].bidAmount.push(_amount);
+    function participateInAuction(address _nftAddress, uint256 _tokenId, uint256 _amount) public payable isOutForAuction(_nftAddress, _tokenId){
+        NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
+
+        if(nftDetail.auctionDetail[_tokenId].isMetis){
+            require(msg.value >= nftDetail.auctionDetail[_tokenId].baseAmount, "Invalid metis amount");
+            nftDetail.auctionDetail[_tokenId].bidAmount.push(msg.value);
+        }else{
+            require(nftDetail.auctionDetail[_tokenId].baseAmount <= _amount, "Invalid peak amount");
+            peakTransferFrom(msg.sender, address(this), _amount);
+            nftDetail.auctionDetail[_tokenId].bidAmount.push(_amount);
+        }
+
+        nftDetail.auctionDetail[_tokenId].participatedUser.push(msg.sender);
     }
 
     function endAuction(address _nftAddress, uint256 _tokenId) public isOutForAuction(_nftAddress, _tokenId) isTokenOwner(address(_nftAddress), _tokenId){
-        require(block.timestamp > nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].endTime, "Invalid time");
-        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].isOutForAuction = false;
+        NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
 
-        uint[] memory bidAmount = nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].bidAmount;
-        address[] memory participatedUsers = nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].participatedUser;
+        require(block.timestamp > nftDetail.auctionDetail[_tokenId].endTime, "Invalid time");
+        
+        nftDetail.auctionDetail[_tokenId].isOutForAuction = false;
+
+        uint[] memory bidAmount = nftDetail.auctionDetail[_tokenId].bidAmount;
+        address[] memory participatedUsers = nftDetail.auctionDetail[_tokenId].participatedUser;
         
         require(bidAmount.length == participatedUsers.length, "Length should be same");
         for(uint i = 0; i < bidAmount.length.sub(1); i++){
@@ -487,35 +525,54 @@ contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUp
                 participatedUsers[i] = tempAdd;
             }
         }
-        uint256 amount = bidAmount[bidAmount.length.sub(1)];
-        address newOwner = participatedUsers[participatedUsers.length.sub(1)];
 
-        nftDetails[_nftAddress][_tokenId].secondaryOwner = newOwner;
-        nftDetails[_nftAddress][_tokenId].priceMetis = 0;
-        nftDetails[_nftAddress][_tokenId].pricePeak = 0;
-        nftDetails[_nftAddress][_tokenId].secondaryOwner = newOwner;
-        nftDetails[_nftAddress][_tokenId].updateTime = block.timestamp;
-        nftDetails[_nftAddress][_tokenId].isForSale = false;
-        nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].auctionWinner = newOwner;
+        if(nftDetail.auctionDetail[_tokenId].isMetis){
+            (, uint treasury, uint fee, uint amountTobePaid) = calculateFeesForMetis(bidAmount[bidAmount.length.sub(1)]);
+            payable(NFTA).transfer(fee);
+            payable(NFTATreasury).transfer(treasury);
+            payable(nftDetail.tokenOwner).transfer(getRoyaltyAmount(_nftAddress, _tokenId));
+            payable(nftDetail.secondaryOwner).transfer(amountTobePaid.sub(getRoyaltyAmount(_nftAddress, _tokenId)));
+        } else {
+            (, uint burn, uint fee, uint amountTobePaid) = calculateFeesForPeak(nftDetail.pricePeak);
+            peakTransferFrom(msg.sender, address(this), nftDetail.pricePeak);
+            peakTransfer(nftDetail.tokenOwner, getRoyaltyAmount(_nftAddress, _tokenId));
+            peak.burn(burn);
+            peakTransfer(NFTA, fee);
+            peakTransfer(nftDetail.secondaryOwner, amountTobePaid.sub(getRoyaltyAmount(_nftAddress, _tokenId)));
+        }
 
-        uint fee = amount.mul(platformFee).div(1e4);
-        require(peak.transfer(nftDetails[_nftAddress][_tokenId].tokenOwner, getRoyaltyAmount(_nftAddress, _tokenId)), "Transfer failed");
-        require(peak.transfer(msg.sender, amount.sub(fee).sub(getRoyaltyAmount(_nftAddress, _tokenId))), "Transfer Failed");
+        nftDetail.secondaryOwner = participatedUsers[participatedUsers.length.sub(1)];
+        nftDetail.priceMetis = 0;
+        nftDetail.pricePeak = 0;
+        nftDetail.updateTime = block.timestamp;
+        nftDetail.isForSale = false;
+        nftDetail.auctionDetail[_tokenId].auctionWinner = participatedUsers[participatedUsers.length.sub(1)];
+        nftDetail.auctionDetail[_tokenId].startTime = 0;
+        nftDetail.auctionDetail[_tokenId].endTime = 0;
+        nftDetail.auctionDetail[_tokenId].baseAmount = 0;
 
+        removeParticipatedUserFromAuctionDetails(_nftAddress, nftDetail.auctionDetail[_tokenId].auctionWinner, _tokenId);
     }
 
-    function refundAuctionTokens(address _nftAddress, uint256 _tokenId) public {
-        require(!nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].isOutForAuction, "Auction is not ended yet.");
+    function refundAuctionTokens(address _nftAddress, uint256 _tokenId) public payable{
+        NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
+        require(!nftDetail.auctionDetail[_tokenId].isOutForAuction, "Auction is not ended yet.");
         
-        uint[] memory bidAmount = nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].bidAmount;
-        address[] memory participatedUsers = nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].participatedUser;
+        uint[] memory bidAmount = nftDetail.auctionDetail[_tokenId].bidAmount;
+        address[] memory participatedUsers = nftDetail.auctionDetail[_tokenId].participatedUser;
 
         for(uint i = 0; i < bidAmount.length; i++){
             if(msg.sender == participatedUsers[i]){
-                require(msg.sender == nftDetails[_nftAddress][_tokenId].auctionDetail[_tokenId].auctionWinner, "You can not get refund");
-                peak.transfer(msg.sender, bidAmount[i]);
+                require(msg.sender == nftDetail.auctionDetail[_tokenId].auctionWinner, "You can not get refund");
+                if(nftDetail.auctionDetail[_tokenId].isMetis){
+                    payable(msg.sender).transfer(bidAmount[i]);
+                }else{
+                    peakTransfer(msg.sender, bidAmount[i]);
+                }
             }
         }
+
+        removeParticipatedUserFromAuctionDetails(_nftAddress, msg.sender, _tokenId);
     }
 
     function getPeakAddress() public view returns(IERC20){
@@ -534,7 +591,47 @@ contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUp
         return tokenList[_nftAddress];
     }
 
-    function getRoyaltyAmount(address _nftAddress, uint _tokenId) public view returns(uint256){
+    function getRoyaltyAmount(address _nftAddress, uint256 _tokenId) public view returns(uint256){
         return nftDetails[_nftAddress][_tokenId].pricePeak.mul(nftDetails[_nftAddress][_tokenId].royaltyFee).div(1e4);
     }
+
+    // Internal functions
+    function peakTransfer(address _to, uint256 _amount) internal {
+        require(peak.transfer(_to, _amount), "Transfer failed");
+    }
+
+    function peakTransferFrom(address _from, address _to, uint256 _amount) internal {
+        require(peak.transferFrom(_from, _to, _amount), "Transferfrom failed");
+    }
+
+    function calculateFeesForPeak(uint _amount) internal view returns( uint256 totalFee, uint256 burn, uint256 fee, uint256 amountTobePaid){
+        totalFee = _amount.mul(platformFee).div(1e4);
+        burn = fee.div(2);
+        fee = totalFee.sub(burn);
+        amountTobePaid = _amount.sub(totalFee);
+        return (totalFee, burn, fee, amountTobePaid);
+    }
+
+    function calculateFeesForMetis(uint _amount) internal view returns(uint256 totalFee, uint256 treasury, uint256 fee, uint256 amountTobePaid){
+        totalFee = _amount.mul(platformFee).div(1e4);
+        treasury = fee.div(3);
+        fee = totalFee.sub(treasury);
+        amountTobePaid = _amount.sub(totalFee);
+        return (totalFee, treasury, fee, amountTobePaid);
+    }
+
+    function removeParticipatedUserFromAuctionDetails(address _nftAddress, address _participatedUser, uint256 _tokenId) internal {
+        NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
+        for(uint i = 0; i < nftDetail.auctionDetail[_tokenId].participatedUser.length; i++){
+            if(_participatedUser == nftDetail.auctionDetail[_tokenId].participatedUser[i]){
+                for (uint j = i; j < nftDetail.auctionDetail[_tokenId].participatedUser.length - 1; j++) {
+                    nftDetail.auctionDetail[_tokenId].participatedUser[j] = nftDetail.auctionDetail[_tokenId].participatedUser[j + 1];
+                    nftDetail.auctionDetail[_tokenId].bidAmount[j] = nftDetail.auctionDetail[_tokenId].bidAmount[j + 1];
+                }
+                nftDetail.auctionDetail[_tokenId].participatedUser.pop();
+                nftDetail.auctionDetail[_tokenId].bidAmount.pop();
+            }
+        }
+    }
+
 }
