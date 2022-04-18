@@ -508,6 +508,9 @@ contract ApparelMarketplace is Initializable, IERC721ReceiverUpgradeable, UUPSUp
         NFTDetails storage nftDetail = nftDetails[_nftAddress][_tokenId];
 
         nftDetail.auctionDetail[_tokenId].isOutForAuction = false;
+        nftDetail.auctionDetail[_tokenId].startTime = 0;
+        nftDetail.auctionDetail[_tokenId].endTime = 0;
+        nftDetail.auctionDetail[_tokenId].baseAmount = 0;
     }
 
     function endAuction(address _nftAddress, uint256 _tokenId) public isOutForAuction(_nftAddress, _tokenId) isTokenOwner(address(_nftAddress), _tokenId){
