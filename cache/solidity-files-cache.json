@@ -1,9 +1,9 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/contracts/ApparelMarketplace.sol": {
-      "lastModificationDate": 1650266275347,
-      "contentHash": "19c992f708e1cff0d2e89a5b44999bd8",
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/contracts/ApparelMarketplace.sol": {
+      "lastModificationDate": 1650988413401,
+      "contentHash": "55baec87bdf865147c58a9eb60018032",
       "sourceName": "contracts/ApparelMarketplace.sol",
       "solcConfig": {
         "version": "0.8.11",
@@ -48,8 +48,8 @@
         "SafeMath"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol": {
-      "lastModificationDate": 1650215865584,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol": {
+      "lastModificationDate": 1650988430637,
       "contentHash": "49c8ad51a559f6dda13d35874f7dfdb9",
       "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
       "solcConfig": {
@@ -86,8 +86,8 @@
         "Initializable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol": {
-      "lastModificationDate": 1650215865748,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol": {
+      "lastModificationDate": 1650988430657,
       "contentHash": "eb2268e7f08e65339fdf577dad98c925",
       "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
       "solcConfig": {
@@ -126,8 +126,8 @@
         "UUPSUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol": {
-      "lastModificationDate": 1650215865624,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol": {
+      "lastModificationDate": 1650988430645,
       "contentHash": "11b77de3cb69dfc6b342ec87bd09cbdd",
       "sourceName": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
       "solcConfig": {
@@ -165,8 +165,8 @@
         "OwnableUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol": {
-      "lastModificationDate": 1650215865428,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol": {
+      "lastModificationDate": 1650988430617,
       "contentHash": "60093f8f135a0646b7193788efa26af3",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol",
       "solcConfig": {
@@ -201,8 +201,8 @@
         "IERC721ReceiverUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol": {
-      "lastModificationDate": 1650215863800,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol": {
+      "lastModificationDate": 1650988430389,
       "contentHash": "b70d2e0552ab1f44f7e44b5f8379c358",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
       "solcConfig": {
@@ -237,8 +237,8 @@
         "AddressUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol": {
-      "lastModificationDate": 1650215864048,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol": {
+      "lastModificationDate": 1650988430409,
       "contentHash": "a6883cfd85607b16c121a02728369eb3",
       "sourceName": "@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol",
       "solcConfig": {
@@ -273,8 +273,8 @@
         "IERC1822ProxiableUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol": {
-      "lastModificationDate": 1650215864360,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol": {
+      "lastModificationDate": 1650988430449,
       "contentHash": "d1ceeaa35b60471b1c6e50d29d70354a",
       "sourceName": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol",
       "solcConfig": {
@@ -315,8 +315,8 @@
         "ERC1967UpgradeUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol": {
-      "lastModificationDate": 1650215865212,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol": {
+      "lastModificationDate": 1650988430577,
       "contentHash": "21bffd733b4ca013e125a0ffe2e52254",
       "sourceName": "@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol",
       "solcConfig": {
@@ -351,8 +351,8 @@
         "IBeaconUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol": {
-      "lastModificationDate": 1650215865720,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol": {
+      "lastModificationDate": 1650988430653,
       "contentHash": "fffe21caed735dbc8a621e3844f0adb1",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol",
       "solcConfig": {
@@ -387,8 +387,8 @@
         "StorageSlotUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
-      "lastModificationDate": 1650215863920,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
+      "lastModificationDate": 1650988430397,
       "contentHash": "6200b84950eb05b4a92a39fd1d6e0f9b",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
       "solcConfig": {
@@ -425,8 +425,8 @@
         "ContextUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol": {
-      "lastModificationDate": 1650215864728,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol": {
+      "lastModificationDate": 1650988430521,
       "contentHash": "8e52b614f6b430aa55873a311e62a8fb",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol",
       "solcConfig": {
@@ -470,8 +470,8 @@
         "ERC721Upgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol": {
-      "lastModificationDate": 1650215865488,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol": {
+      "lastModificationDate": 1650988430617,
       "contentHash": "3bea986b69e509a8d978ab2502a8bf2e",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol",
       "solcConfig": {
@@ -508,8 +508,8 @@
         "IERC721Upgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol": {
-      "lastModificationDate": 1650215865420,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol": {
+      "lastModificationDate": 1650988430613,
       "contentHash": "76212ca0265501d1eb3dd1175e6afca4",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol",
       "solcConfig": {
@@ -546,8 +546,8 @@
         "IERC721MetadataUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol": {
-      "lastModificationDate": 1650215865724,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol": {
+      "lastModificationDate": 1650988430653,
       "contentHash": "f60b5fcbc57911b0fbc7a31a110f90bc",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
       "solcConfig": {
@@ -582,8 +582,8 @@
         "StringsUpgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol": {
-      "lastModificationDate": 1650215864336,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol": {
+      "lastModificationDate": 1650988430445,
       "contentHash": "5f2d8b81c0ff5bd2047b4846c20b998d",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol",
       "solcConfig": {
@@ -621,8 +621,8 @@
         "ERC165Upgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol": {
-      "lastModificationDate": 1650215865312,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol": {
+      "lastModificationDate": 1650988430597,
       "contentHash": "d6ecf203a5e72c845be9bbf2f304a289",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol",
       "solcConfig": {
@@ -657,8 +657,94 @@
         "IERC165Upgradeable"
       ]
     },
-    "/home/alite-21/Pictures/other/NFT-Apparel-Smartcontract/contracts/NFTBase.sol": {
-      "lastModificationDate": 1650214577599,
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol": {
+      "lastModificationDate": 1650988430585,
+      "contentHash": "eb51ed084f6f7fd2c7098715c5690285",
+      "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.11",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../utils/introspection/IERC165Upgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC1155ReceiverUpgradeable"
+      ]
+    },
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/contracts/Marketpplace-ERC1155-compitable.sol": {
+      "lastModificationDate": 1650988413401,
+      "contentHash": "5036268e98eb5b4e8e7b2f07e0b0d3f6",
+      "sourceName": "contracts/Marketpplace-ERC1155-compitable.sol",
+      "solcConfig": {
+        "version": "0.8.11",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.11"
+      ],
+      "artifacts": [
+        "ApparelMarketplace",
+        "ERC165",
+        "IERC1155",
+        "IERC165",
+        "IERC20",
+        "IERC721",
+        "SafeMath"
+      ]
+    },
+    "/home/hrk/swProjects/NFT-Apparel-Smartcontract/contracts/NFTBase.sol": {
+      "lastModificationDate": 1650988413401,
       "contentHash": "83e9869e3dee6f1318506528e73511e9",
       "sourceName": "contracts/NFTBase.sol",
       "solcConfig": {
