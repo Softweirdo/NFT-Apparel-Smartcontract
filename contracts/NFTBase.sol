@@ -1267,26 +1267,10 @@ contract ERC721A is Context, ERC165, IERC721, IERC721Metadata {
 
 pragma solidity ^0.8.11;
 
-// contract NFTBaseFactory is Initializable, UUPSUpgradeable, OwnableUpgradeable {
-
-//     // Mendatory function for UUPS:
-//     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
-
-//     function initialize() public initializer {
-//         __Ownable_init();
-//         //fee = 10;
-//     }
-
-//     mapping(uint => address) public NFTList;
-//     uint NFTListIterator;
-
-//     function deployNFT(string calldata _name, string calldata _symbol) external onlyOwner {
-//         NFTBase baseToken = new NFTBase(_name, _symbol);
-//         NFTList[NFTListIterator] = address(baseToken);
-//     }
-// }
-
 contract NFTBase is  Initializable, ERC721Upgradeable, UUPSUpgradeable, OwnableUpgradeable {
+
+    mapping(uint256 => string) public _tokenURI;
+    uint256 public tokenId;
 
     // Mendatory function for UUPS:
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
@@ -1296,7 +1280,20 @@ contract NFTBase is  Initializable, ERC721Upgradeable, UUPSUpgradeable, OwnableU
         __Ownable_init();
     }
 
-    function mint(address _userAddress) public {
-        _safeMint(_userAddress, 1, "0x00");
+    function mint(address _userAddress, string memory uri) public {
+        _safeMint(_userAddress, tokenId, "0x00");
+        setTokenURI(tokenId, uri);
+        tokenId++;
+    }
+
+    function setTokenURI(uint256 tokenId, string memory uri) public {
+        _tokenURI[tokenId] = uri;
+    }
+
+    /**
+     * @dev See {IERC721Metadata-tokenURI}.
+     */
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        return _tokenURI[tokenId];
     }
 }
