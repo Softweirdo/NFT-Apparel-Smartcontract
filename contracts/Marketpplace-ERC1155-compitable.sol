@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/introspection/ERC165Checker.sol";
 
 /**
  * @title SafeMath
@@ -37,6 +38,12 @@ library SafeMath {
     }
 }
 
+// Compatibility check interface
+interface ITest {
+    function isERC1155(address nftAddress) external returns (bool);
+    function isERC721(address nftAddress) external returns (bool);
+}
+
 // File: @openzeppelin/contracts/utils/introspection/IERC165.sol
 
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/IERC165.sol)
@@ -50,17 +57,17 @@ library SafeMath {
  *
  * For an implementation, see {ERC165}.
  */
-interface IERC165 {
-    /**
-     * @dev Returns true if this contract implements the interface defined by
-     * `interfaceId`. See the corresponding
-     * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]
-     * to learn more about how these ids are created.
-     *
-     * This function call must use less than 30 000 gas.
-     */
-    function supportsInterface(bytes4 interfaceId) external view returns (bool);
-}
+// interface IERC165 {
+//     /**
+//      * @dev Returns true if this contract implements the interface defined by
+//      * `interfaceId`. See the corresponding
+//      * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]
+//      * to learn more about how these ids are created.
+//      *
+//      * This function call must use less than 30 000 gas.
+//      */
+//     function supportsInterface(bytes4 interfaceId) external view returns (bool);
+// }
 
 // File: @openzeppelin/contracts/utils/introspection/ERC165.sol
 
@@ -480,7 +487,9 @@ contract ApparelMarketplace is
     Initializable,
     IERC721ReceiverUpgradeable,
     UUPSUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    ITest, 
+    IERC165
 {
     function _authorizeUpgrade(address newImplementation)
         internal
@@ -489,6 +498,7 @@ contract ApparelMarketplace is
     {}
 
     using SafeMath for uint256;
+    using ERC165Checker for address;
 
     struct NFTDetails {
         address tokenOwner;
@@ -526,6 +536,12 @@ contract ApparelMarketplace is
     }
 
     uint256 public platformFee;
+
+    // Variable declaration for ERC165 compatibility 
+    bytes4 public constant IID_ITEST = type(ITest).interfaceId;
+    bytes4 public constant IID_IERC165 = type(IERC165).interfaceId;
+    bytes4 public constant IID_IERC1155 = type(IERC1155).interfaceId;
+    bytes4 public constant IID_IERC721 = type(IERC721).interfaceId;
 
     address public NFTA;
     address public NFTATreasury;
@@ -1123,4 +1139,17 @@ contract ApparelMarketplace is
             }
         }
     }
+    
+    function isERC1155(address nftAddress) external view override returns (bool) {
+        return nftAddress.supportsInterface(IID_IERC1155);
+    }    
+    
+    function isERC721(address nftAddress) external view override returns (bool) {
+        return nftAddress.supportsInterface(IID_IERC721);
+    }
+    
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == IID_ITEST || interfaceId == IID_IERC165;
+    }
+
 }
